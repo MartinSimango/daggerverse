@@ -1,0 +1,29 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - 'main'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/Checkout@v4
+      - name: Release
+        uses: dagger/dagger-for-github@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GPG_KEY: ${{ secrets.GPG_KEY }}
+        with:
+          version: "latest"
+          verb: call 
+          module: gopkg 
+          args: release --source=. --dry-run=false --gpg-key=env://GPG_KEY --token=env://GITHUB_TOKEN 
+          cloud-token: ${{ secrets.DAGGER_CLOUD_TOKEN }}
+
