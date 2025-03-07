@@ -15,10 +15,10 @@ func (m *Gopkg) release(
 	pass *dagger.Secret,
 	dryRun bool,
 ) (string, error) {
-	// releaseCommand := "--dry-run"
-	// if !dryRun {
-	// 	releaseCommand = "--no-ci"
-	// }
+	releaseCommand := "--dry-run"
+	if !dryRun {
+		releaseCommand = "--no-ci"
+	}
 
 	container := dag.Container().
 		From("node:23.7.0").
@@ -54,7 +54,9 @@ func (m *Gopkg) release(
 	}
 
 	return container.
-		WithExec([]string{"bash", "-c", "npx semantic-release --no-ci --debug || true"}).
-		WithExec([]string{"bash", "-c", "git log --show-signature"}).
+		WithExec(
+			[]string{"bash", "-c", fmt.Sprintf("npx semantic-release %s --debug", releaseCommand)},
+		).
+		// WithExec([]string{"bash", "-c", "git log --show-signature"}).
 		Stdout(ctx)
 }
