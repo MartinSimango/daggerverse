@@ -38,6 +38,8 @@ func (m *Gopkg) release(
 			WithEnvVariable("GIT_USERNAME", "MartinSimango").
 			WithEnvVariable("GIT_AUTHOR_NAME", "Martin Simango").
 			WithEnvVariable("GIT_AUTHOR_EMAIL", "shukomango@gmail.com").
+			WithEnvVariable("GIT_COMMITTER_NAME", "Martin Simango").
+			WithEnvVariable("GIT_COMMITTER_EMAIL", "shukomango@gmail.com").
 			// WithSecretVariable("PASS", pass).
 			WithExec([]string{"apt-get", "install", "-y", "gnupg"}).
 			// WithExec([]string{"bash", "-c", "echo \"$GPG_KEY\" > /tmp/gpg.key"}).
