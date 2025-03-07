@@ -21,7 +21,7 @@ func (m *Gopkg) release(
 	}
 
 	container := dag.Container().
-		From("node:23.7.0").
+		From("node:23.7.0-alpine").
 		WithDirectory("/src", source).
 		WithWorkdir("/src").
 		WithMountedCache("/root/.npm", dag.CacheVolume("node-23")).
@@ -51,8 +51,7 @@ func (m *Gopkg) release(
 			// WithExec([]string{"bash", "-c", "git config --global user.email \"shukomango@gmail.com\""}).
 			WithExec([]string{"bash", "-c", "printf \"trust\n5\ny\nquit\n\" | gpg --batch --command-fd 0 --edit-key 60BEEE74E301083F"}).
 			WithExec([]string{"bash", "-c", fmt.Sprintf("git config --global user.signingkey %s", "60BEEE74E301083F")}).
-			WithExec([]string{"bash", "-c", "git config --global gpg.program gpg"}).
-			WithExec([]string{"bash", "-c", "git config --global core.editor true"})
+			WithExec([]string{"bash", "-c", "git config --global gpg.program gpg"})
 		// WithExec([]string{"bash", "-c", "git commit -a -m \"Test\""})
 	}
 
