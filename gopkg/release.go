@@ -12,16 +12,17 @@ func (m *Gopkg) release(
 	source *dagger.Directory,
 	token *dagger.Secret,
 	gpgKey *dagger.Secret,
-	pass *dagger.Secret,
 	dryRun bool,
 ) (string, error) {
 	releaseCommand := "--dry-run"
 	if !dryRun {
 		releaseCommand = "--no-ci"
 	}
+	// 		WithExec([]string{"apk", "add", "gnupg", "bash","git"}).
+	//		WithExec([]string{"bash", "-c", "gpg-agent --daemon"}).
 
 	container := dag.Container().
-		From("node:23.7.0-alpine").
+		From("node:23.7.0").
 		WithDirectory("/src", source).
 		WithWorkdir("/src").
 		WithMountedCache("/root/.npm", dag.CacheVolume("node-23")).
@@ -35,13 +36,14 @@ func (m *Gopkg) release(
 		container = container.
 			WithSecretVariable("GPG_KEY", gpgKey).
 			WithEnvVariable("GIT_EMAIL", "shukomango@gmail.com").
-			WithEnvVariable("GIT_USERNAME", "MartinSimango").
+			WithEnvVariable("GIT_USERNAME", "Martin Simango").
 			WithEnvVariable("GIT_AUTHOR_NAME", "Martin Simango").
 			WithEnvVariable("GIT_AUTHOR_EMAIL", "shukomango@gmail.com").
 			WithEnvVariable("GIT_COMMITTER_NAME", "Martin Simango").
 			WithEnvVariable("GIT_COMMITTER_EMAIL", "shukomango@gmail.com").
+			WithExec([]string{"apt-get", "update"}).
 			// WithSecretVariable("PASS", pass).
-			WithExec([]string{"apt-get", "install", "-y", "gnupg"}).
+			WithExec([]string{"apt-get", "install", "-y", "gnupg", "vim"}).
 			// WithExec([]string{"bash", "-c", "echo \"$GPG_KEY\" > /tmp/gpg.key"}).
 			// WithExec([]string{"bash", "-c", "echo \"$PASS\" | gpg --import --batch --yes --passphrase-fd 0 /tmp/gpg.key"}).
 			WithExec([]string{"bash", "-c", "echo \"$GPG_KEY\" | gpg --import"}).

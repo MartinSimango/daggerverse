@@ -46,7 +46,6 @@ func (m *Gopkg) Release(
 	// +default=true
 	// Dry run the release
 	dryRun bool,
-	password *dagger.Secret,
 ) (string, error) {
-	return m.release(ctx, source, token, gpgKey, password, dryRun)
+	return m.release(ctx, source, token, gpgKey, dryRun)
 }
