@@ -35,7 +35,7 @@ func (m *Gopkg) release(
 		container = container.
 			WithSecretVariable("GPG_KEY", gpgKey).
 			WithEnvVariable("GIT_EMAIL", "shukomango@gmail.com").
-			WithEnvVariable("GIT_USERNAME", "MartinSimango").
+			WithEnvVariable("GIT_USERNAME", "Martin Simango").
 			WithEnvVariable("GIT_AUTHOR_NAME", "Martin Simango").
 			WithEnvVariable("GIT_AUTHOR_EMAIL", "shukomango@gmail.com").
 			// WithSecretVariable("PASS", pass).
