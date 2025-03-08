@@ -16,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/Checkout@v4
       - name: Release
-        uses: dagger/dagger-for-github@v7
+        uses: dagger/dagger-for-github@v8
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           GPG_KEY: ${{ secrets.GPG_KEY }}
@@ -26,6 +26,14 @@ jobs:
           verb: call 
           module: gopkg 
           args: |
-            with-git-gpg-config --gpg-key=env://GPG_KEY --gpg-key-id=env://GPG_KEY_ID --git-author-name "semantic-release-bot" --git-author-email "shukomango@gmail.com" release --source=. --dry-run=false --token=env://GITHUB_TOKEN
+            with-git-gpg-config \
+              --gpg-key=env://GPG_KEY \
+              --gpg-key-id=env://GPG_KEY_ID \
+              --git-author-name "semantic-release-bot" \
+              --git-author-email "shukomango@gmail.com" \
+            release \
+              --source=. \
+              --dry-run=false \
+              --token=env://GITHUB_TOKEN
           cloud-token: ${{ secrets.DAGGER_CLOUD_TOKEN }}
 
