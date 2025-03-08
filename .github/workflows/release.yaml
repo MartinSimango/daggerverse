@@ -25,8 +25,7 @@ jobs:
           version: "latest"
           verb: call 
           module: gopkg 
-          args: |
-            with-git-gpg-config \
+          args: with-git-gpg-config \
               --gpg-key=env://GPG_KEY \
               --gpg-key-id=env://GPG_KEY_ID \
               --git-author-name "semantic-release-bot" \
