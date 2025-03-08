@@ -25,14 +25,15 @@ jobs:
           version: "latest"
           verb: call 
           module: gopkg 
-          args: with-git-gpg-config \
-              --gpg-key=env://GPG_KEY \
-              --gpg-key-id=env://GPG_KEY_ID \
-              --git-author-name "semantic-release-bot" \
-              --git-author-email "shukomango@gmail.com" \
-            release \
-              --source=. \
-              --dry-run=false \
-              --token=env://GITHUB_TOKEN
+          args: >
+            with-git-gpg-config
+            --gpg-key=env://GPG_KEY
+            --gpg-key-id=env://GPG_KEY_ID
+            --git-author-name "semantic-release-bot"
+            --git-author-email "shukomango@gmail.com"
+            release
+            --source=.
+            --dry-run=false
+            --token=env://GITHUB_TOKEN
           cloud-token: ${{ secrets.DAGGER_CLOUD_TOKEN }}
 
