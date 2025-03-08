@@ -20,7 +20,18 @@ import (
 	"dagger/gopkg/internal/dagger"
 )
 
-type Gopkg struct{}
+type GitGpgConfig struct {
+	// GPG private key for signing the semantic-release bot
+	GpgKey         *dagger.Secret
+	GpgKeyId       *dagger.Secret
+	GpgPassword    *dagger.Secret
+	GitAuthorName  string
+	GitAuthorEmail string
+}
+
+type Gopkg struct {
+	GpgConfig *GitGpgConfig
+}
 
 // Test the project
 func (m *Gopkg) Test(ctx context.Context,
@@ -39,13 +50,35 @@ func (m *Gopkg) Release(
 	source *dagger.Directory,
 	// GitHub token for the release
 	token *dagger.Secret,
-	// GPG private key for signing the semantic-release bot
-	// +optional
-	gpgKey *dagger.Secret,
 	// +optional
 	// +default=true
 	// Dry run the release
 	dryRun bool,
 ) (string, error) {
-	return m.release(ctx, source, token, gpgKey, dryRun)
+	return m.release(ctx, source, token, dryRun)
+}
+
+// WithGitGpgConfig sets the GPG configuration for the git repository. To be used with Release.
+func (m *Gopkg) WithGitGpgConfig(
+	// GPG private key for signing the semantic-release bot
+	gpgKey *dagger.Secret,
+	// GPG key ID
+	gpgKeyId *dagger.Secret,
+	// GPG password for the private key, if any
+	// +optional
+	gpgPassword *dagger.Secret,
+	// Git author name for the release commits
+	gitAuthorName string,
+	// Git author email for the release commits
+	gitAuthorEmail string,
+) *Gopkg {
+	m.GpgConfig = &GitGpgConfig{
+		GpgKey:         gpgKey,
+		GpgKeyId:       gpgKeyId,
+		GpgPassword:    gpgPassword,
+		GitAuthorName:  gitAuthorName,
+		GitAuthorEmail: gitAuthorEmail,
+	}
+
+	return m
 }

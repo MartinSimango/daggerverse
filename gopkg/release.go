@@ -11,15 +11,12 @@ func (m *Gopkg) release(
 	ctx context.Context,
 	source *dagger.Directory,
 	token *dagger.Secret,
-	gpgKey *dagger.Secret,
 	dryRun bool,
 ) (string, error) {
 	releaseCommand := "--dry-run"
 	if !dryRun {
 		releaseCommand = "--no-ci"
 	}
-	// 		WithExec([]string{"apk", "add", "gnupg", "bash","git"}).
-	//		WithExec([]string{"bash", "-c", "gpg-agent --daemon"}).
 
 	container := dag.Container().
 		From("node:23.7.0-alpine").
@@ -30,38 +27,49 @@ func (m *Gopkg) release(
 		WithSecretVariable("GITHUB_TOKEN", token).
 		WithExec([]string{"npm", "install", "--save-dev", "@semantic-release/git"}).
 		WithExec([]string{"npm", "install", "--save-dev", "@semantic-release/changelog"}).
-		WithExec([]string{"npm", "install", "--save-dev", "conventional-changelog-conventionalcommits"})
+		WithExec([]string{"npm", "install", "--save-dev", "conventional-changelog-conventionalcommits"}).
+		WithExec([]string{"apk", "add", "git", "bash"})
 
-	if gpgKey != nil {
-		container = container.
-			WithSecretVariable("GPG_KEY", gpgKey).
-			// WithEnvVariable("GIT_EMAIL", "shukomango@gmail.com").
-			// WithEnvVariable("GIT_USERNAME", "Martin Simango").
-			WithEnvVariable("GIT_AUTHOR_NAME", "semantic-release-bot").
-			WithEnvVariable("GIT_AUTHOR_EMAIL", "shukomango@gmail.com").
-			WithEnvVariable("GIT_COMMITTER_NAME", "semantic-release-bot").
-			WithEnvVariable("GIT_COMMITTER_EMAIL", "shukomango@gmail.com").
-			WithExec([]string{"apk", "add", "gnupg","bash","git"}).
-			WithExec([]string{"bash", "-c", "gpg-agent --daemon"}).
-			// WithSecretVariable("PASS", pass).
-			// WithExec([]string{"bash", "-c", "echo \"$GPG_KEY\" > /tmp/gpg.key"}).
-			// WithExec([]string{"bash", "-c", "echo \"$PASS\" | gpg --import --batch --yes --passphrase-fd 0 /tmp/gpg.key"}).
-			WithExec([]string{"bash", "-c", "echo \"$GPG_KEY\" | gpg --import"}).
-			WithExec([]string{"bash", "-c", "git config commit.gpgsign true"}).
-			// WithExec([]string{"bash", "-c", "git config tag.gpgsign true"}).
-			// WithExec([]string{"bash", "-c", "git config --global user.name \"Martin Simango\""}).
-			// WithExec([]string{"bash", "-c", "git config --global user.email \"shukomango@gmail.com\""}).
-			WithExec([]string{"bash", "-c", "printf \"trust\n5\ny\nquit\n\" | gpg --batch --command-fd 0 --edit-key 60BEEE74E301083F"}).
-			WithExec([]string{"bash", "-c", fmt.Sprintf("git config --global user.signingkey %s", "60BEEE74E301083F")}).
-			WithExec([]string{"bash", "-c", "git config --global gpg.program gpg"})
-			// WithExec([]string{"bash","-c", "git config --global core.editor \"true\""})
-		// WithExec([]string{"bash", "-c", "git commit -a -m \"Test\""})
+	if m.GpgConfig != nil {
+		container = m.setUpGpg(container.WithExec([]string{"apk", "add", "gnupg"}))
 	}
 
-	return container.
-		WithExec(
-			[]string{"bash", "-c", fmt.Sprintf("npx semantic-release %s --debug", releaseCommand)},
-		).
-		// WithExec([]string{"bash", "-c", "git log --show-signature"}).
-		Stdout(ctx)
+	return container.WithExec(
+		[]string{"bash", "-c", fmt.Sprintf("npx semantic-release %s --debug", releaseCommand)},
+	).Stdout(ctx)
+}
+
+func (m *Gopkg) setUpGpg(container *dagger.Container) *dagger.Container {
+	container = container.
+		WithSecretVariable("GPG_KEY", m.GpgConfig.GpgKey).
+		WithSecretVariable("GPG_KEY_ID", m.GpgConfig.GpgKeyId).
+		WithEnvVariable("GIT_AUTHOR_NAME", m.GpgConfig.GitAuthorName).
+		WithEnvVariable("GIT_AUTHOR_EMAIL", m.GpgConfig.GitAuthorEmail).
+		WithEnvVariable("GIT_COMMITTER_NAME", m.GpgConfig.GitAuthorName).
+		WithEnvVariable("GIT_COMMITTER_EMAIL", m.GpgConfig.GitAuthorEmail).
+		WithExec([]string{"apk", "add", "gnupg", "bash", "git"}).
+		WithExec([]string{"bash", "-c", "gpg-agent --daemon"}). // ensure gpg-agent is running
+		WithExec([]string{"bash", "-c", "git config commit.gpgsign true"}).
+		WithExec([]string{"bash", "-c", "git config --global user.signingkey \"$GPG_KEY_ID\""})
+
+	return m.loadGpgKey(container)
+}
+
+func (m *Gopkg) loadGpgKey(container *dagger.Container) *dagger.Container {
+	if m.GpgConfig.GpgPassword != nil {
+		container = container.WithSecretVariable("GPG_PASSPHRASE", m.GpgConfig.GpgPassword).
+			WithExec([]string{"bash", "-c", "echo \"$GPG_KEY\" > /tmp/gpg.key"}).
+			WithExec([]string{"bash", "-c", "echo \"$GPG_PASSPHRASE\" | gpg --import --batch --yes --passphrase-fd 0 /tmp/gpg.key"}).
+			WithExec([]string{"bash", "-c", "echo 'gpg --passphrase ${GPG_PASSPHRASE} --batch --yes --pinentry-mode=loopback --no-tty \"$@\"' > /tmp/gpg-with-passphrase && chmod +x /tmp/gpg-with-passphrase"}).
+			WithExec([]string{"bash", "-c", "git config gpg.program \"/tmp/gpg-with-passphrase\""})
+	} else {
+		container = container.WithExec([]string{"bash", "-c", "echo \"$GPG_KEY\" | gpg --import"})
+	}
+	return container.WithExec(
+		[]string{
+			"bash",
+			"-c",
+			"printf \"trust\n5\ny\nquit\n\" | gpg --batch --command-fd 0 --edit-key \"$GPG_KEY_ID\"",
+		},
+	)
 }
