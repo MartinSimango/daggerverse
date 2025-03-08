@@ -20,7 +20,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           GPG_KEY: ${{ secrets.GPG_KEY }}
-          GPG_KEY_ID: ${{ env.GPG_KEY_ID }}
+          GPG_KEY_ID: $GPG_KEY_ID
         with:
           version: "latest"
           verb: call 
