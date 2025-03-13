@@ -9,6 +9,3 @@ updates:
     directory: "/gopkg" # Location of package manifests
     schedule:
       interval: "weekly"
-    ignore:
-      - dependency-name: "github.com/MartinSimango/daggerverse/gopkg/internal/dagger"
-        versions: ["*"]
