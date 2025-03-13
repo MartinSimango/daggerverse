@@ -21,7 +21,6 @@ import (
 )
 
 type GitGpgConfig struct {
-	// GPG private key for signing the semantic-release bot
 	GpgKey         *dagger.Secret
 	GpgKeyId       *dagger.Secret
 	GpgPassword    *dagger.Secret
@@ -55,6 +54,31 @@ func (m *Gopkg) Release(
 	// Dry run the release
 	dryRun bool,
 ) (string, error) {
+	return m.release(ctx, source, token, dryRun)
+}
+
+/*
+	 GopkgFlow runs a release flow for a Go project using semantic-release
+		This runs the following steps:
+		1. Test the project
+		2. Release a new version of the project using semantic-release
+*/
+func (m *Gopkg) GopkgFlow(
+	ctx context.Context,
+	// Source directory for the project
+	// +defaultPath="."
+	source *dagger.Directory,
+	// GitHub token for the release
+	token *dagger.Secret,
+	// +optional
+	// +default=true
+	// Dry run the release
+	dryRun bool,
+) (string, error) {
+	_, err := m.test(ctx, source)
+	if err != nil {
+		return "", err
+	}
 	return m.release(ctx, source, token, dryRun)
 }
 
