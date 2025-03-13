@@ -22,8 +22,15 @@ func (m *Gopkg) release(
 		From("node:23.7.0-alpine").
 		WithDirectory("/src", source).
 		WithWorkdir("/src").
+		// Cache npm global packages
 		WithMountedCache("/root/.npm", dag.CacheVolume("node-23")).
+		// Cache project dependencies
 		WithMountedCache("/src/node_modules", dag.CacheVolume("node_modules-cache")).
+		// Cache npx binary files
+		WithMountedCache("/root/.cache", dag.CacheVolume("npx-cache")).
+		// Cache Alpine package manager (optional, but can help speed up package installs)
+		WithMountedCache("/var/cache/apk", dag.CacheVolume("apk-cache")).
+		// Inject secret for GitHub authentication
 		WithSecretVariable("GITHUB_TOKEN", token).
 		WithExec([]string{"npm", "install", "--save-dev", "@semantic-release/git"}).
 		WithExec([]string{"npm", "install", "--save-dev", "@semantic-release/changelog"}).
