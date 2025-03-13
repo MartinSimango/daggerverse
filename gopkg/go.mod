@@ -1,4 +1,4 @@
-module dagger/gopkg
+module github.com/MartinSimango/daggverse/gopkg
 
 go 1.23.6
 
