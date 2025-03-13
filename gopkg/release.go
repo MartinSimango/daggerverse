@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"dagger/gopkg/internal/dagger"
+	"github.com/MartinSimango/daggerverse/gopkg/internal/dagger"
 )
 
 func (m *Gopkg) release(

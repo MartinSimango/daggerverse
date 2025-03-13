@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	"dagger/gopkg/internal/dagger"
+	"github.com/MartinSimango/daggerverse/gopkg/internal/dagger"
 )
 
 func (m *Gopkg) test(ctx context.Context,

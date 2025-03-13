@@ -17,7 +17,7 @@ package main
 import (
 	"context"
 
-	"dagger/gopkg/internal/dagger"
+	"github.com/MartinSimango/daggerverse/gopkg/internal/dagger"
 )
 
 type GitGpgConfig struct {
@@ -58,10 +58,10 @@ func (m *Gopkg) Release(
 }
 
 /*
-	 GopkgFlow runs a release flow for a Go project using semantic-release
-		This runs the following steps:
-		1. Test the project
-		2. Release a new version of the project using semantic-release
+GopkgFlow runs a release flow for a Go project using semantic-release
+This runs the following steps:
+1. Test the project
+2. Release a new version of the project using semantic-release
 */
 func (m *Gopkg) GopkgFlow(
 	ctx context.Context,
