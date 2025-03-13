@@ -10,5 +10,5 @@ updates:
     schedule:
       interval: "weekly"
     ignore:
-      - dependency-name: "dagger/gopkg/internal/dagger"
+      - dependency-name: "github.com/MartinSimango/daggerverse/gopkg/internal/dagger"
         versions: ["*"]
