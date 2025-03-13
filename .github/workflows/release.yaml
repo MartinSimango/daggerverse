@@ -22,7 +22,7 @@ jobs:
           GPG_KEY: ${{ secrets.GPG_KEY }}
           GPG_KEY_ID: ${{ vars.GPG_KEY_ID }}
         with:
-          version: "latest"
+          version: "v0.16.3"
           verb: call 
           module: gopkg 
           args: "with-git-gpg-config --gpg-key=env://GPG_KEY --gpg-key-id=env://GPG_KEY_ID --git-author-name \"semantic-release-bot\" --git-author-email \"shukomango@gmail.com\" release --source=. --dry-run=false --token=env://GITHUB_TOKEN"

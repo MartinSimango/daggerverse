@@ -22,11 +22,15 @@ release-with-gpg-no-pass:
 		--token=env://GITHUB_TOKEN
 
 
-
 release:
 	@dagger call -m gopkg release \
 		--source=. \
 		--dry-run=false \
 		--token=env://GITHUB_TOKEN
 
+release-dry-run:
+	@dagger call -m gopkg release \
+		--source=. \
+		--dry-run=true \
+		--token=env://GITHUB_TOKEN
 
