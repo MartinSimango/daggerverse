@@ -57,6 +57,17 @@ func (m *Gopkg) Release(
 	return m.release(ctx, source, token, dryRun)
 }
 
+// Lint the project using golangci-lint with the provided configuration
+func (m *Gopkg) Lint(ctx context.Context,
+	source *dagger.Directory,
+	// +optional
+	// +default=".golangcli.yml"
+	// Lint configuration file
+	config string,
+) (string, error) {
+	return m.lint(ctx, source, config)
+}
+
 /*
 GopkgFlow runs a release flow for a Go project using semantic-release
 This runs the following steps:
@@ -71,11 +82,20 @@ func (m *Gopkg) GopkgFlow(
 	// GitHub token for the release
 	token *dagger.Secret,
 	// +optional
+	// +default=".golangcli.yml"
+	// Lint configuration file
+	config string,
+	// +optional
 	// +default=true
 	// Dry run the release
 	dryRun bool,
 ) (string, error) {
-	_, err := m.test(ctx, source)
+	_, err := m.lint(ctx, source, config)
+	if err != nil {
+		return "", err
+	}
+
+	_, err = m.test(ctx, source)
 	if err != nil {
 		return "", err
 	}

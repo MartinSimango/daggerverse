@@ -35,4 +35,17 @@ release-dry-run:
 		--token=env://GITHUB_TOKEN
 
 
+gopkg-flow:
+	@dagger call -m gopkg with-git-gpg-config \
+		--gpg-key=env://GPG_KEY \
+		--gpg-key-id=env://GPG_KEY_ID \
+		--gpg-password=env://GPG_PASSPHRASE \
+		--git-author-name "semantic-release-bot" \
+		--git-author-email "shukomango@gmail.com" \
+gopkg-flow \
+		--source=. \
+		--token=env://GITHUB_TOKEN \
+		--dry-run=false 
+
+
 
