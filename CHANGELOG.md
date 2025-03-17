@@ -1,3 +1,9 @@
+## [0.4.0](https://github.com/MartinSimango/daggerverse/compare/v0.3.0...v0.4.0) (2025-03-17)
+
+### Features
+
+* add lint function ([#9](https://github.com/MartinSimango/daggerverse/issues/9)) ([08b409c](https://github.com/MartinSimango/daggerverse/commit/08b409c731b9ca52cdacd9f3b3952fefe5d30234))
+
 ## [0.3.0](https://github.com/MartinSimango/daggerverse/compare/v0.2.0...v0.3.0) (2025-03-13)
 
 ### Features
